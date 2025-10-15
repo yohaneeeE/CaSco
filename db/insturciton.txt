@@ -1,0 +1,5 @@
+1. go to phpmyadmin (database)
+2. select import
+3. insert em_mentor.sql
+4. import import
+5. finished (you have now database of this system)

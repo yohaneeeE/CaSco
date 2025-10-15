@@ -20,217 +20,131 @@ $certificates     = $input['certificates'] ?? [];
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Career Suggestions | eMentor</title>
-<link rel="icon" type="image/x-icon" href="img/em.png">
+<title>CareerScope | Career Suggestions</title>
+<link rel="icon" type="image/x-icon" href="img/cs.png">
 
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
+* { margin:0; padding:0; box-sizing:border-box; }
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f5f6fa;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  color: #333;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background:#f4f4f4; color:#333; line-height:1.6;
 }
 
 /* HEADER */
 header {
-  background: linear-gradient(135deg, #444, #666);
-  color: #fff;
-  text-align: center;
-  padding: 25px 0;
-  position: relative;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg,#666,#888);
+    color:white; text-align:center; padding:25px 0;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2); position:relative;
 }
-header h1 { margin: 0; font-size: 2.2rem; letter-spacing: 0.5px; }
-header p { margin-top: 5px; font-size: 1rem; opacity: 0.9; }
+header h1 { font-size:2.5rem; margin-bottom:10px; }
+header p { font-size:1.1rem; opacity:0.9; }
 
 /* HAMBURGER */
 .hamburger {
-  position: absolute;
-  top: 22px; left: 25px;
-  width: 30px; height: 22px;
-  cursor: pointer; z-index: 1100;
-  display: flex; flex-direction: column; justify-content: space-between;
+    position:absolute; top:20px; left:20px;
+    width:30px; height:22px; display:flex;
+    flex-direction:column; justify-content:space-between;
+    cursor:pointer; z-index:300;
 }
-.hamburger span {
-  display: block; width: 100%; height: 4px;
-  background: #fff; border-radius: 2px;
-  transition: 0.3s;
-}
-.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
-.hamburger.active span:nth-child(2) { opacity: 0; }
-.hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+.hamburger span { height:4px; background:white; border-radius:2px; }
+.hamburger.active span:nth-child(1){ transform:rotate(45deg) translate(5px,5px); }
+.hamburger.active span:nth-child(2){ opacity:0; }
+.hamburger.active span:nth-child(3){ transform:rotate(-45deg) translate(6px,-6px); }
 
 /* SIDEBAR */
 .sidebar {
-  position: fixed; top: 0; left: -260px;
-  width: 260px; height: 100%;
-  background: #222; color: #fff;
-  transition: left 0.3s ease; z-index: 1000;
-  padding-top: 80px; display: flex; flex-direction: column;
+    position:fixed; top:0; left:-250px;
+    width:250px; height:100%; background:#444;
+    color:white; padding:60px 20px; display:flex; flex-direction:column; gap:20px;
+    transition:left 0.3s ease; z-index:200;
 }
-.sidebar.active { left: 0; }
+.sidebar.active { left:0; }
 .sidebar a {
-  color: #ddd; text-decoration: none;
-  padding: 14px 25px;
-  font-size: 1.05rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  transition: background 0.3s, padding-left 0.3s;
+    color:white; text-decoration:none; font-size:1.1rem;
+    padding:8px 0; display:block; transition:0.3s;
 }
-.sidebar a:hover { background: rgba(255,255,255,0.1); padding-left: 35px; }
-.sidebar hr { border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 10px 0; }
-.user-info {
-  margin-top: auto; padding: 15px 25px;
-  border-top: 1px solid rgba(255,255,255,0.2);
-  color: #ffcc00; font-size: 0.9rem;
-  text-align: center;
-}
+.sidebar a:hover { color:#ffcc00; transform:translateX(5px); }
+.user-info { margin-top:auto; padding-top:15px; border-top:1px solid rgba(255,255,255,0.2); color:#ffcc00; text-align:center; font-size:0.95rem; }
 
 /* OVERLAY */
 .overlay {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  opacity: 0; visibility: hidden;
-  transition: 0.3s;
-  z-index: 900;
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.4); opacity:0; visibility:hidden; transition:0.3s; z-index:100;
 }
-.overlay.active { opacity: 1; visibility: visible; }
+.overlay.active { opacity:1; visibility:visible; }
 
-/* MAIN CONTAINER */
+/* MAIN CONTENT */
 .container {
-  flex: 1; max-width: 1100px;
-  margin: 30px auto;
-  padding: 30px;
-  background: #fff;
-  border-radius: 15px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    max-width:900px; margin:60px auto; padding:35px 40px;
 }
-h2 {
-  text-align: center;
-  color: #444;
-  font-size: 1.8rem;
-  margin-bottom: 30px;
-  position: relative;
+.hero-like {
+    background:#fff; padding:35px 30px; border-radius:10px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.1); margin-bottom:40px;
 }
-h2::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 50%; transform: translateX(-50%);
-  width: 90px; height: 3px;
-  background: linear-gradient(90deg, #666, #ffcc00);
-  border-radius: 3px;
+.hero-like h2 { font-size:2rem; color:#004080; margin-bottom:15px; text-align:center; }
+.hero-like a.back-link {
+    display:inline-block; padding:12px 25px; background:#ffcc00;
+    color:#333; border-radius:6px; text-decoration:none; font-weight:600; transition:0.3s;
 }
+.hero-like a.back-link:hover { background:#e6b800; }
 
 /* BOXES */
 .box {
-  background: #fafafa;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 25px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    background:#fff; padding:25px; margin-bottom:25px; border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
 }
-.box h3 {
-  color: #333;
-  margin-bottom: 15px;
-  font-size: 1.3rem;
-  display: flex; align-items: center;
-  gap: 8px;
-}
+.box h3 { font-size:1.3rem; margin-bottom:15px; color:#004080; display:flex; align-items:center; gap:8px; }
 
 /* TABLE */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  font-size: 0.95rem;
-}
-th, td {
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: center;
-}
-th {
-  background: #333;
-  color: #fff;
-  font-weight: 600;
-}
-td { background: #fff; }
-tr:nth-child(even) td { background: #f9f9f9; }
+table { width:100%; border-collapse:collapse; font-size:0.95rem; }
+th, td { border:1px solid #ccc; padding:10px; text-align:center; }
+th { background:#004080; color:#fff; font-weight:600; }
+tr:nth-child(even) td { background:#f9f9f9; }
 
 /* BUTTONS */
-button {
-  padding: 12px 25px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.3s;
-}
-button#backBtn {
-  background: #333; color: #ffcc00;
-}
-button#backBtn:hover { background: #555; }
-button#printBtn {
-  background: #555; color: #fff;
-}
-button#printBtn:hover { background: #777; }
+button { padding:12px 25px; border:none; border-radius:8px; font-size:1rem; cursor:pointer; transition:0.3s; }
+#backBtn { background:#ffcc00; color:#333; }
+#backBtn:hover { background:#e6b800; }
+#printBtn { background:#004080; color:#fff; }
+#printBtn:hover { background:#003366; }
 
 /* FOOTER */
-footer {
-  text-align: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #333, #555);
-  color: #fff;
-  font-size: 0.9rem;
-  margin-top: auto;
-}
+footer { text-align:center; padding:20px; background:#444; color:#ddd; font-size:0.95rem; margin-top:40px; }
 
 /* RESPONSIVE */
-@media (max-width: 768px) {
-  header h1 { font-size: 1.6rem; }
-  .container { padding: 20px; margin: 20px; }
-  table th, table td { font-size: 0.85rem; padding: 8px; }
-  button { width: 100%; margin-top: 10px; }
-}
+@media(max-width:768px){.container{padding:25px 20px;} header h1{font-size:2rem;}}
+@media(max-width:600px){.hero-like h2{font-size:1.7rem;} table th, table td{font-size:0.85rem; padding:8px;} button{width:100%; margin-top:10px;}}
 </style>
 </head>
 <body>
 
-<div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
-
 <header>
-  <h1>eMentor</h1>
-  <p>Your Digital Career Guidance</p>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+  <h1>CareerScope</h1>
+  <p>Your Trusted Career Guidance</p>
 </header>
 
-<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-    <a href="index.php">Home</a>
-    <a href="career-guidance.php">Career Guidance</a>
-    <a href="careerpath.php">Career Path</a>
-    <a href="about.php">About</a>
-    <hr style="border: 1px solid rgba(255,255,255,0.2);">
-    <?php if ($isLoggedIn): ?>
-        <a href="settings.php">Settings</a>
-        <a href="logout.php" onclick="return confirm('Are you sure you want to logout?');">Logout</a>
-        <div class="user-info">
-            Logged in as <br><strong><?php echo htmlspecialchars($fullName); ?></strong>
-        </div>
-    <?php else: ?>
-        <a href="login.php">Login</a>
-    <?php endif; ?>
+  <a href="index.php">Home</a>
+  <a href="career-guidance.php">Career Guidance</a>
+  <a href="careerpath.php">Career Path</a>
+  <a href="about.php">About</a>
+  <hr style="border:1px solid rgba(255,255,255,0.2);">
+  <?php if ($isLoggedIn): ?>
+      <span class="user-info">👋 Welcome, <?= htmlspecialchars($fullName) ?></span>
+      <a href="settings.php">Settings</a>
+      <a href="logout.php" onclick="return confirm('Are you sure you want to logout?');">Logout</a>
+  <?php else: ?>
+      <a href="login.php">Login</a>
+  <?php endif; ?>
 </div>
 
 <div class="overlay" id="overlay"></div>
 
 <div class="container">
-  <h2>Career Suggestions Based on Your Transcript</h2>
+  <section class="hero-like">
+    <h2>Career Suggestions Based on Your Transcript</h2>
+  </section>
 
   <div class="box">
     <h3>📄 All Subjects</h3>
@@ -261,41 +175,29 @@ footer {
 </div>
 
 <footer>
-  <p>&copy; 2025 Mapping The Future System. All rights reserved.</p>
+  <p>&copy; <?= date("Y") ?> CareerScope. All rights reserved.</p>
 </footer>
 
 <script>
 let rawSubjects   = <?= json_encode($rawSubjects) ?>;
 let mappedSkills  = <?= json_encode($mappedSkills) ?>;
 let careerOptions = <?= json_encode($careerOptions) ?>;
-let certificates  = <?= json_encode($certificates) ?>;
-
-if ((!rawSubjects || rawSubjects.length === 0) && sessionStorage.apiResult) {
-  const apiResult = JSON.parse(sessionStorage.apiResult);
-  rawSubjects   = apiResult.rawSubjects   || [];
-  mappedSkills  = apiResult.mappedSkills  || {};
-  careerOptions = apiResult.careerOptions || [];
-}
 
 // Render Subjects
 const rawTableBody = document.getElementById("rawTableBody");
-if (Array.isArray(rawSubjects) && rawSubjects.length > 0) {
+if (Array.isArray(rawSubjects) && rawSubjects.length) {
   rawSubjects.forEach(([subject, grade]) => {
     rawTableBody.innerHTML += `<tr><td>${subject}</td><td>${grade}</td></tr>`;
   });
-} else {
-  rawTableBody.innerHTML = "<tr><td colspan='2'>No subjects detected.</td></tr>";
-}
+} else rawTableBody.innerHTML="<tr><td colspan='2'>No subjects detected.</td></tr>";
 
 // Render Skills
 const skillsTableBody = document.getElementById("skillsTableBody");
-if (Object.keys(mappedSkills).length > 0) {
-  for (const [skill, level] of Object.entries(mappedSkills)) {
-    skillsTableBody.innerHTML += `<tr><td>${skill}</td><td>${level}</td></tr>`;
-  }
-} else {
-  skillsTableBody.innerHTML = "<tr><td colspan='2'>No skills detected.</td></tr>";
-}
+if (mappedSkills && Object.keys(mappedSkills).length) {
+  Object.entries(mappedSkills).forEach(([skill, level])=>{
+    skillsTableBody.innerHTML+=`<tr><td>${skill}</td><td>${level}</td></tr>`;
+  });
+} else skillsTableBody.innerHTML="<tr><td colspan='2'>No skills detected.</td></tr>";
 
 // Render Career Matches + Suggestions
 const careerBox = document.getElementById("careerMatchesBox");
@@ -303,38 +205,34 @@ const careerList = document.getElementById("careerMatchesList");
 const suggestBox = document.getElementById("suggestBox");
 const suggestList = document.getElementById("suggestList");
 
-if (Array.isArray(careerOptions) && careerOptions.length > 0) {
+if (Array.isArray(careerOptions) && careerOptions.length) {
   careerBox.style.display = "block";
   suggestBox.style.display = "block";
   let suggestionSet = new Set();
 
-  careerList.innerHTML = careerOptions.map(c => {
-    if (c.suggestion) suggestionSet.add(c.suggestion);
-    return `<li><strong>${c.career}</strong> - Confidence: ${c.confidence || "N/A"}%<br><em>${c.suggestion || ""}</em></li>`;
+  careerList.innerHTML = careerOptions.map(c=>{
+    if(c.suggestion) suggestionSet.add(c.suggestion);
+    return `<li><strong>${c.career}</strong> - Confidence: ${c.confidence||"N/A"}%<br><em>${c.suggestion||""}</em></li>`;
   }).join("");
 
-  suggestList.innerHTML = [...suggestionSet].map(s => `<li>${s}</li>`).join("");
+  suggestList.innerHTML = [...suggestionSet].map(s=>`<li>${s}</li>`).join("");
 }
 
 // Back button
-document.getElementById("backBtn").addEventListener("click", () => {
-    window.history.back();
-});
-
-// Print button
-document.getElementById("printBtn").addEventListener("click", () => window.print());
+document.getElementById("backBtn").addEventListener("click",()=>window.history.back());
+document.getElementById("printBtn").addEventListener("click",()=>window.print());
 
 // Sidebar toggle
 const hamburger = document.getElementById("hamburger");
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
 
-hamburger.addEventListener("click", () => {
+hamburger.addEventListener("click",()=>{
   hamburger.classList.toggle("active");
   sidebar.classList.toggle("active");
   overlay.classList.toggle("active");
 });
-overlay.addEventListener("click", () => {
+overlay.addEventListener("click",()=>{
   hamburger.classList.remove("active");
   sidebar.classList.remove("active");
   overlay.classList.remove("active");

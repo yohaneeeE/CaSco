@@ -4,9 +4,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 include 'db_connect.php';
-include 'reset_mail.php'; // ✅ include your mail function
+include 'reset_mail.php'; // Mail function
 
-// ✅ Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -14,7 +13,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// ✅ Fetch user data
+// Fetch user data
 $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -23,7 +22,7 @@ $user = $result->fetch_assoc();
 
 $success = $error = "";
 
-// ✅ Handle profile update
+// ✅ Profile Update
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
     $fullname = !empty($_POST['fullname']) ? $_POST['fullname'] : $user['fullname'];
     $email = !empty($_POST['email']) ? $_POST['email'] : $user['email'];
@@ -54,7 +53,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
     if ($update->execute()) {
         $success = "✅ Profile updated successfully!";
         $_SESSION['user_name'] = $fullname;
-        // Refresh user data
         $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -65,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
     }
 }
 
-// ✅ Handle password change (with mail)
+// ✅ Password Change
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['change_password'])) {
     $current = $_POST['current_password'];
     $new = $_POST['new_password'];
@@ -73,24 +71,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['change_password'])) {
 
     if (password_verify($current, $user['password'])) {
         if ($new === $confirm) {
-            // Generate reset verification code
             $resetCode = rand(100000, 999999);
-
-            // Store the code in DB or session
             $_SESSION['pending_reset'] = [
                 'user_id' => $user_id,
                 'new_password' => password_hash($new, PASSWORD_DEFAULT),
                 'reset_code' => $resetCode
             ];
 
-            // Send email
             $mailSent = sendForgotPasswordEmail($user['fullname'], $user['email'], $resetCode);
-
             if ($mailSent) {
                 header("Location: verify_reset.php");
                 exit();
             } else {
-                $error = "⚠️ Failed to send verification email. Please try again.";
+                $error = "⚠️ Failed to send verification email.";
             }
         } else {
             $error = "⚠️ New passwords do not match.";
@@ -103,165 +96,269 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['change_password'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Settings - eMentor</title>
-<link rel="icon" type="image/x-icon" href="img/em.png">
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #e6e6e6;
-  color: #333;
-}
-header {
-  background: linear-gradient(135deg, #444, #666);
-  color: #fff;
-  padding: 20px;
-  text-align: center;
-}
-header h1 { font-size: 2rem; margin-bottom: 5px; }
-header p { opacity: 0.9; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Settings | CareerScope</title>
+  <link rel="icon" type="image/x-icon" href="img/cs.png" />
 
-.container {
-  max-width: 900px;
-  margin: 40px auto;
-  background: #fff;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-}
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+    }
 
-/* BUTTONS */
-button {
-  padding: 12px 25px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.3s;
-}
-button#backBtn {
-  background: #333; color: #ffcc00;
-}
-button#backBtn:hover { background: #555; }
-button#printBtn {
-  background: #555; color: #fff;
-}
-button#printBtn:hover { background: #777; }
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, #666, #888);
+      color: white;
+      padding: 25px 0;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
 
-h2 {
-  text-align: center;
-  color: #444;
-  margin-bottom: 20px;
-}
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
 
-h3 {
-  margin-top: 25px;
-  color: #555;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 5px;
-  font-size: 1.2rem;
-}
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
 
-.profile-pic {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-.profile-pic img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #555;
-  transition: 0.3s;
-}
-.profile-pic img:hover {
-  transform: scale(1.05);
-}
+    /* HAMBURGER */
+    .hamburger {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 30px;
+      height: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      z-index: 300;
+    }
 
-input[type=text],
-input[type=email],
-input[type=password],
-input[type=file] {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin: 8px 0 15px 0;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-}
-input:focus {
-  border-color: #ffcc00;
-  outline: none;
-}
+    .hamburger span {
+      height: 4px;
+      background: white;
+      border-radius: 2px;
+    }
 
-button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  background: #ffcc00;
-  color: #333;
-  font-weight: bold;
-  cursor: pointer;
-  display: block;
-  width: 60%;
-  max-width: 250px;
-  margin: 15px auto;
-  transition: all 0.3s ease;
-}
-button:hover {
-  background: #ffdb4d;
-  transform: scale(1.05);
-}
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: #444;
+      color: white;
+      padding: 60px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: left 0.3s ease;
+      z-index: 200;
+    }
 
-.message {
-  padding: 12px;
-  border-radius: 6px;
-  margin-bottom: 15px;
-  text-align: center;
-  font-weight: 500;
-}
-.success { background: #d4edda; color: #155724; }
-.error { background: #f8d7da; color: #721c24; }
+    .sidebar.active {
+      left: 0;
+    }
 
-form {
-  margin-top: 15px;
-}
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      font-size: 1.1rem;
+      padding: 8px 0;
+      display: block;
+      transition: 0.3s;
+    }
 
-@media (max-width: 768px) {
-  .container {
-    width: 90%;
-    padding: 20px;
-  }
-  header h1 {
-    font-size: 1.6rem;
-  }
-  button {
-    width: 100%;
-    font-size: 1rem;
-  }
-  input {
-    font-size: 0.95rem;
-  }
-}
-</style>
+    .sidebar a:hover {
+      color: #ffcc00;
+      transform: translateX(5px);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      z-index: 100;
+    }
+
+    .overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* MAIN CONTAINER */
+    .container {
+      max-width: 900px;
+      margin: 60px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, #666, #ffcc00);
+      border-radius: 3px;
+    }
+
+    h3 {
+      margin-top: 25px;
+      color: #444;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+      font-size: 1.2rem;
+    }
+
+    .profile-pic {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .profile-pic img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #555;
+      object-fit: cover;
+      transition: 0.3s;
+    }
+
+    .profile-pic img:hover { transform: scale(1.05); }
+
+    input[type=text],
+    input[type=email],
+    input[type=password],
+    input[type=file] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin: 8px 0 15px 0;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: #ffcc00;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #ffcc00;
+      color: #333;
+      font-weight: bold;
+      cursor: pointer;
+      display: block;
+      width: 60%;
+      max-width: 250px;
+      margin: 15px auto;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: #ffdb4d;
+      transform: scale(1.05);
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #444;
+      color: #ddd;
+      margin-top: 40px;
+      font-size: 0.95rem;
+    }
+
+    footer a {
+      color: #ffcc00;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .container { width: 90%; padding: 25px; }
+      header h1 { font-size: 1.8rem; }
+      button { width: 100%; }
+    }
+  </style>
 </head>
+
 <body>
 
 <header>
-  <h1>eMentor</h1>
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+  <h1>CareerScope</h1>
   <p>Manage your profile and security settings</p>
 </header>
+
+<div class="sidebar" id="sidebar">
+  <a href="index.php">Home</a>
+  <a href="career-guidance.php">Career Guidance</a>
+  <a href="careerpath.php">Career Path</a>
+  <a href="about.php">About</a>
+  <hr style="border:1px solid rgba(255,255,255,0.2);">
+  <a href="settings.php" style="color:#ffcc00;">⚙️ Settings</a>
+  <a href="logout.php" onclick="return confirm('Are you sure you want to logout?');">Logout</a>
+</div>
+
+<div class="overlay" id="overlay"></div>
 
 <div class="container">
   <h2>👤 Account Settings</h2>
 
-  <?php if($success): ?><div class="message success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
-  <?php if($error): ?><div class="message error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
+  <?php if ($success): ?><div class="message success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
+  <?php if ($error): ?><div class="message error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
 
   <div class="profile-pic">
     <img src="<?= isset($user['profile_image']) && !empty($user['profile_image']) ? 'uploads/profile_images/' . htmlspecialchars($user['profile_image']) : 'img/default.png' ?>" alt="Profile Picture">
@@ -295,6 +392,26 @@ form {
     <button type="submit" name="change_password">🔑 Update Password</button>
   </form>
 </div>
+
+<footer>
+  &copy; <?= date("Y") ?> CareerScope | A Capstone Project by IT Students of Bulacan State University - Bustos Campus
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+  });
+
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+  });
+</script>
 
 </body>
 </html>

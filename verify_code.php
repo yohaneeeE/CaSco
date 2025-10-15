@@ -1,37 +1,32 @@
 <?php
 session_start();
 include 'db_connect.php';
-include 'reset_mail.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sendCode'])) {
-    $email = trim($_POST['resetEmail']);
-    if (empty($email)) {
-        echo "<script>alert('Please enter your email.');</script>";
+if (!isset($_SESSION['reset_email'])) {
+    header("Location: request_reset.php");
+    exit;
+}
+
+$email = $_SESSION['reset_email'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verifyCode'])) {
+    $code = trim($_POST['resetCode']);
+    if (empty($code)) {
+        echo "<script>alert('Please enter the verification code.');</script>";
     } else {
-        $stmt = $conn->prepare("SELECT fullName FROM users WHERE email=?");
-        $stmt->bind_param("s", $email);
+        $stmt = $conn->prepare("SELECT id FROM pending_users WHERE email=? AND verification_code=?");
+        $stmt->bind_param("ss", $email, $code);
         $stmt->execute();
-        $stmt->bind_result($fullName);
+        $stmt->store_result();
 
-        if ($stmt->fetch()) {
-            $stmt->close();
-            $resetCode = rand(100000, 999999);
-
-            $conn->query("DELETE FROM pending_users WHERE email='$email'");
-            $stmt = $conn->prepare("INSERT INTO pending_users (fullName,email,verification_code) VALUES (?,?,?)");
-            $stmt->bind_param("sss", $fullName, $email, $resetCode);
-            $stmt->execute();
-
-            if (sendForgotPasswordEmail($fullName, $email, $resetCode)) {
-                $_SESSION['reset_email'] = $email;
-                header("Location: verify_code.php");
-                exit;
-            } else {
-                echo "<script>alert('Failed to send reset email.');</script>";
-            }
+        if ($stmt->num_rows === 1) {
+            $_SESSION['code_verified'] = true;
+            header("Location: reset_password.php");
+            exit;
         } else {
-            echo "<script>alert('Email not found.');</script>";
+            echo "<script>alert('Invalid code. Please check your email.');</script>";
         }
+        $stmt->close();
     }
 }
 $conn->close();
@@ -42,7 +37,7 @@ $conn->close();
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Forgot Password | CareerScope</title>
+<title>Verify Code | CareerScope</title>
 <link rel="icon" type="image/x-icon" href="img/cs.png">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -81,16 +76,13 @@ button:hover { background:#e6b800; transform:scale(1.02); }
 .links { margin-top:18px; text-align:center; }
 .links a { color:#333; text-decoration:none; transition:0.3s; }
 .links a:hover { color:#ffcc00; }
-
-/* Responsive */
-@media(max-width:480px) { .container { margin:40px 15px; padding:30px 20px; } header h1 { font-size:1.8rem; } }
 </style>
 </head>
 <body>
 <header>
   <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
   <h1>CareerScope</h1>
-  <p>Empowering students with data-driven career guidance</p>
+  <p>Enter the code sent to your email</p>
 </header>
 
 <div class="sidebar" id="sidebar">
@@ -109,13 +101,15 @@ button:hover { background:#e6b800; transform:scale(1.02); }
 <div class="overlay" id="overlay"></div>
 
 <div class="container">
-    <h2>Forgot Password</h2>
     <form method="post">
+        <h2>Verify Code</h2>
         <label>Email</label>
-        <input type="email" name="resetEmail" placeholder="Enter your email" required>
-        <button type="submit" name="sendCode">Send Reset Code</button>
+        <input type="email" value="<?php echo htmlspecialchars($email); ?>" readonly>
+        <label>Verification Code</label>
+        <input type="text" name="resetCode" placeholder="Enter code" required>
+        <button type="submit" name="verifyCode">Verify Code</button>
     </form>
-    <div class="links"><a href="login.php">Back to Login</a></div>
+    <div class="links"><a href="request_reset.php">Back to Email Entry</a></div>
 </div>
 
 <script>

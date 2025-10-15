@@ -1,36 +1,33 @@
 <?php
 session_start();
 include 'db_connect.php';
-include 'reset_mail.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sendCode'])) {
-    $email = trim($_POST['resetEmail']);
-    if (empty($email)) {
-        echo "<script>alert('Please enter your email.');</script>";
+if (!isset($_SESSION['reset_email'], $_SESSION['code_verified'])) {
+    header("Location: request_reset.php");
+    exit;
+}
+
+$email = $_SESSION['reset_email'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resetPassword'])) {
+    $newPassword = $_POST['newPassword'];
+    $confirmPassword = $_POST['confirmPassword'];
+
+    if (!$newPassword || !$confirmPassword) {
+        echo "<script>alert('All fields are required.');</script>";
+    } elseif ($newPassword !== $confirmPassword) {
+        echo "<script>alert('Passwords do not match.');</script>";
     } else {
-        $stmt = $conn->prepare("SELECT fullName FROM users WHERE email=?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $stmt->bind_result($fullName);
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("UPDATE users SET password=? WHERE email=?");
+        $stmt->bind_param("ss", $hashedPassword, $email);
 
-        if ($stmt->fetch()) {
-            $stmt->close();
-            $resetCode = rand(100000, 999999);
-
+        if ($stmt->execute()) {
             $conn->query("DELETE FROM pending_users WHERE email='$email'");
-            $stmt = $conn->prepare("INSERT INTO pending_users (fullName,email,verification_code) VALUES (?,?,?)");
-            $stmt->bind_param("sss", $fullName, $email, $resetCode);
-            $stmt->execute();
-
-            if (sendForgotPasswordEmail($fullName, $email, $resetCode)) {
-                $_SESSION['reset_email'] = $email;
-                header("Location: verify_code.php");
-                exit;
-            } else {
-                echo "<script>alert('Failed to send reset email.');</script>";
-            }
+            unset($_SESSION['reset_email'], $_SESSION['code_verified']);
+            echo "<script>alert('Password reset successful! You can now log in.'); window.location='login.php';</script>";
         } else {
-            echo "<script>alert('Email not found.');</script>";
+            echo "<script>alert('Error updating password.');</script>";
         }
     }
 }
@@ -42,7 +39,7 @@ $conn->close();
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Forgot Password | CareerScope</title>
+<title>Reset Password | CareerScope</title>
 <link rel="icon" type="image/x-icon" href="img/cs.png">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -81,16 +78,13 @@ button:hover { background:#e6b800; transform:scale(1.02); }
 .links { margin-top:18px; text-align:center; }
 .links a { color:#333; text-decoration:none; transition:0.3s; }
 .links a:hover { color:#ffcc00; }
-
-/* Responsive */
-@media(max-width:480px) { .container { margin:40px 15px; padding:30px 20px; } header h1 { font-size:1.8rem; } }
 </style>
 </head>
 <body>
 <header>
   <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
   <h1>CareerScope</h1>
-  <p>Empowering students with data-driven career guidance</p>
+  <p>Set your new password</p>
 </header>
 
 <div class="sidebar" id="sidebar">
@@ -109,11 +103,15 @@ button:hover { background:#e6b800; transform:scale(1.02); }
 <div class="overlay" id="overlay"></div>
 
 <div class="container">
-    <h2>Forgot Password</h2>
     <form method="post">
+        <h2>Reset Password</h2>
         <label>Email</label>
-        <input type="email" name="resetEmail" placeholder="Enter your email" required>
-        <button type="submit" name="sendCode">Send Reset Code</button>
+        <input type="email" value="<?php echo htmlspecialchars($email); ?>" readonly>
+        <label>New Password</label>
+        <input type="password" name="newPassword" placeholder="Enter new password" required>
+        <label>Confirm New Password</label>
+        <input type="password" name="confirmPassword" placeholder="Confirm new password" required>
+        <button type="submit" name="resetPassword">Set Password</button>
     </form>
     <div class="links"><a href="login.php">Back to Login</a></div>
 </div>

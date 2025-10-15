@@ -10,136 +10,233 @@ $fullName   = $isLoggedIn ? $_SESSION['fullName'] : null;
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Career Path Assessment - eMentor</title>
-<link rel="icon" type="image/x-icon" href="img/em.png">
+<title>CareerScope | Career Path Assessment</title>
+<link rel="icon" type="image/x-icon" href="img/cs.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <style>
-/* ===== RESET ===== */
+/* RESET */
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f2f2f2;
+  background-color: #f4f4f4;
   color: #333;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  line-height: 1.6;
 }
-/* ===== HEADER ===== */
+
+/* HEADER */
 header {
-  background: linear-gradient(135deg, #444, #666);
-  color: #fff;
-  padding: 15px 10px;
+  background: linear-gradient(135deg, #666, #888);
+  color: white;
   text-align: center;
+  padding: 25px 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   position: relative;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
-header h1 { font-size: 1.7rem; margin-bottom: 5px; }
-header p { font-size: 0.95rem; opacity: 0.9; }
-/* ===== HAMBURGER ===== */
+header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* HAMBURGER MENU */
 .hamburger {
   position: absolute;
-  top: 20px; left: 20px;
-  width: 28px; height: 22px;
+  top: 20px;
+  left: 20px;
+  width: 30px;
+  height: 22px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
   z-index: 300;
-  transition: transform 0.3s ease;
 }
 .hamburger span {
-  height: 4px; background: white;
-  border-radius: 2px; transition: all 0.3s ease;
+  height: 4px;
+  background: white;
+  border-radius: 2px;
+  transition: 0.3s;
 }
 .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
 .hamburger.active span:nth-child(2) { opacity: 0; }
 .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
-/* ===== SIDEBAR ===== */
+
+/* SIDEBAR */
 .sidebar {
   position: fixed;
-  top: 0; left: -250px;
-  width: 250px; height: 100%;
-  background: #222; color: white;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background: #444;
+  color: white;
   padding: 60px 20px;
-  display: flex; flex-direction: column;
-  gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   transition: left 0.3s ease;
-  z-index: 500;
+  z-index: 200;
 }
 .sidebar.active { left: 0; }
 .sidebar a {
-  color: white; text-decoration: none;
-  font-size: 1rem; padding: 6px 0;
-  transition: 0.2s;
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  padding: 8px 0;
+  display: block;
+  transition: 0.3s;
 }
-.sidebar a:hover { color: #ffcc00; transform: translateX(4px); }
+.sidebar a:hover, .sidebar a.active {
+  color: #ffcc00;
+  transform: translateX(5px);
+}
 .sidebar hr { border: 1px solid rgba(255,255,255,0.2); }
 .sidebar .user-info {
-  margin-top: auto; padding-top: 10px;
+  margin-top: auto;
+  padding-top: 10px;
   border-top: 1px solid rgba(255,255,255,0.2);
-  color: #ffcc00; font-size: 0.9rem; text-align: center;
+  color: #ffcc00;
+  font-size: 0.9rem;
+  text-align: center;
 }
-/* ===== OVERLAY ===== */
+
+/* OVERLAY */
 .overlay {
-  position: fixed; top: 0; left: 0;
+  position: fixed;
+  top: 0; left: 0;
   width: 100%; height: 100%;
   background: rgba(0,0,0,0.4);
   opacity: 0; visibility: hidden;
   transition: opacity 0.3s ease;
-  z-index: 400;
+  z-index: 100;
 }
 .overlay.active { opacity: 1; visibility: visible; }
-/* ===== MAIN CONTENT ===== */
+
+/* MAIN CONTAINER */
 .container {
-  width: 95%; max-width: 800px;
-  margin: 20px auto; padding: 20px;
-  background: #fff; border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 40px 30px;
+  text-align: center;
 }
-h2 { text-align: center; margin-bottom: 15px; color: #333; }
+.container h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* FORM ELEMENTS */
 label {
-  font-weight: bold; display: block;
-  margin-top: 10px; margin-bottom: 5px;
+  font-weight: 600;
+  display: block;
+  text-align: left;
+  margin-top: 15px;
+  margin-bottom: 8px;
 }
 input[type="file"] {
-  width: 100%; padding: 10px;
-  border-radius: 6px; border: 1px solid #ccc;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  transition: border 0.3s;
 }
+input[type="file"]:hover {
+  border-color: #aaa;
+}
+
+/* BUTTONS */
 button {
-  padding: 10px 16px; border: none; border-radius: 8px;
-  background: #ffcc00; font-weight: bold;
-  cursor: pointer; transition: background 0.3s;
+  background: #ffcc00;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #333;
+  transition: 0.3s;
+  margin-top: 20px;
 }
-button:hover { background: #ffd633; }
+button:hover {
+  background: #e6b800;
+}
+.remove-btn {
+  background: #999;
+  color: white;
+  margin-left: 10px;
+}
+.remove-btn:hover {
+  background: #777;
+}
+
+/* PREVIEW */
 .preview-container {
-  display: flex; flex-wrap: wrap;
-  gap: 8px; margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 15px;
+  justify-content: center;
 }
 .preview-item {
-  border: 1px solid #ddd; border-radius: 8px;
-  background: #fff; text-align: center;
-  padding: 6px; width: 110px; font-size: 0.85rem;
+  width: 130px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 .preview-item img {
-  max-width: 100%; max-height: 90px; border-radius: 4px;
+  max-width: 100%;
+  max-height: 100px;
+  border-radius: 4px;
 }
-.preview-pdf { font-size: 1.5rem; color: #d32f2f; }
+.preview-pdf {
+  font-size: 1.5rem;
+  color: #d32f2f;
+}
+
+/* RESULT BOX */
 #resultBox {
-  margin-top: 20px; padding: 12px; border-radius: 6px;
-  background: #f9f9f9; color: #333;
-  font-size: 0.95rem; overflow-y: auto;
+  margin-top: 25px;
+  padding: 14px;
+  border-radius: 6px;
+  background: #f9f9f9;
+  color: #333;
+  font-size: 1rem;
+  text-align: center;
 }
-/* ===== RESPONSIVE ===== */
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #444;
+  color: #ddd;
+  margin-top: 40px;
+  font-size: 0.95rem;
+}
+footer a {
+  color: #ffcc00;
+  text-decoration: none;
+}
+footer a:hover { text-decoration: underline; }
+
+/* RESPONSIVE */
 @media (max-width: 768px) {
-  header h1 { font-size: 1.4rem; }
-  header p { font-size: 0.85rem; padding: 0 10px; }
-  .container { width: 95%; margin: 15px auto; padding: 15px; }
+  .container { padding: 25px; }
   .preview-item { width: 45%; }
-  .sidebar { width: 70%; padding: 50px 15px; }
 }
 @media (max-width: 480px) {
-  .hamburger { top: 15px; left: 15px; width: 26px; }
-  button { width: 100%; margin-top: 10px; }
+  button { width: 100%; }
   .preview-item { width: 100%; }
 }
 </style>
@@ -148,13 +245,13 @@ button:hover { background: #ffd633; }
 
 <header>
   <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
-  <h1>eMentor</h1>
-  <p>Upload your Academic Grades & Certificates to get personalized career recommendations</p>
+  <h1>CareerScope</h1>
+  <p>Upload your academic records to explore your personalized career path</p>
 </header>
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-  <a href="dashboard.php">Home</a>
+  <a href="index.php">Home</a>
   <a href="career-guidance.php">Career Guidance</a>
   <a href="careerpath.php" class="active">Career Path</a>
   <a href="about.php">About</a>
@@ -162,7 +259,7 @@ button:hover { background: #ffd633; }
   <?php if ($isLoggedIn): ?>
       <a href="settings.php">Settings</a>
       <a href="logout.php" onclick="return confirm('Are you sure you want to logout?');">Logout</a>
-      <div class="user-info">Logged in as <br><strong><?= htmlspecialchars($fullName) ?></strong></div>
+      <div class="user-info">👋 Logged in as<br><strong><?= htmlspecialchars($fullName) ?></strong></div>
   <?php else: ?>
       <a href="login.php">Login</a>
   <?php endif; ?>
@@ -188,11 +285,17 @@ button:hover { background: #ffd633; }
   <div id="resultBox"></div>
 </div>
 
+<footer>
+  <p>&copy; <?= date("Y") ?> CareerScope | Empowering students with data-driven guidance |
+     <a href="about.php">Learn More</a>
+  </p>
+</footer>
+
 <script>
-// Sidebar toggle
 const hamburger = document.getElementById('hamburger');
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
+
 hamburger.addEventListener('click', () => {
   sidebar.classList.toggle('active');
   overlay.classList.toggle('active');
@@ -204,14 +307,13 @@ overlay.addEventListener('click', () => {
   hamburger.classList.remove('active');
 });
 
-// ---- Enhanced PDF-to-Image Conversion ----
 async function pdfToImages(file) {
   const pdfData = await file.arrayBuffer();
   const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
   const images = [];
   for (let i = 1; i <= pdfDoc.numPages; i++) {
     const page = await pdfDoc.getPage(i);
-    const viewport = page.getViewport({ scale: 3 }); // higher DPI for OCR clarity
+    const viewport = page.getViewport({ scale: 3 });
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
     canvas.width = viewport.width;
@@ -219,14 +321,10 @@ async function pdfToImages(file) {
     await page.render({ canvasContext: context, viewport }).promise;
     const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png", 1.0));
     images.push(new File([blob], `${file.name}-page${i}.png`, { type: "image/png" }));
-    // free memory after each page
-    canvas.width = 0;
-    canvas.height = 0;
   }
   return images;
 }
 
-// ---- Preview Files ----
 function previewFile(file, container) {
   const item = document.createElement("div");
   item.className = "preview-item";
@@ -246,7 +344,6 @@ function previewFile(file, container) {
   container.appendChild(item);
 }
 
-// ---- File Input Setup ----
 const torInput = document.getElementById("torInput"),
       torPreview = document.getElementById("torPreview");
 torInput.addEventListener("change", () => {
@@ -268,14 +365,12 @@ addCertBtn.addEventListener("click", () => {
   certContainer.appendChild(div);
 });
 
-// ---- Submit & Upload ----
 document.getElementById("submitTorBtn").addEventListener("click", async () => {
   const file = torInput.files[0];
   if (!file) { alert("Please upload a TOR."); return; }
 
   const formData = new FormData();
 
-  // Convert TOR PDF to images
   if (file.type === "application/pdf") {
     const images = await pdfToImages(file);
     images.forEach(img => formData.append("file", img));
@@ -283,7 +378,6 @@ document.getElementById("submitTorBtn").addEventListener("click", async () => {
     formData.append("file", file);
   }
 
-  // Handle certificates (convert PDFs to images too)
   const certInputs = document.querySelectorAll('input[name="certificateFiles[]"]');
   for (const input of certInputs) {
     if (input.files[0]) {
@@ -315,3 +409,4 @@ document.getElementById("submitTorBtn").addEventListener("click", async () => {
 </script>
 </body>
 </html>
+

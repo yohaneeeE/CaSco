@@ -2,59 +2,69 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 include 'db_connect.php';
-
-// ✅ Check if there's a pending reset from settings.php
-if (!isset($_SESSION['pending_reset'])) {
-    header("Location: settings.php");
-    exit();
-}
-
-$pending = $_SESSION['pending_reset'];
-$user_id = $pending['user_id'];
-$reset_code = $pending['reset_code'];
-$new_password = $pending['new_password'];
 
 $success = $error = "";
 
-// ✅ Verify the submitted code
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['verify_code'])) {
-    $entered_code = trim($_POST['code']);
-
-    if ($entered_code == $reset_code) {
-        // ✅ Update the password in DB
-        $update = $conn->prepare("UPDATE users SET password=? WHERE id=?");
-        $update->bind_param("si", $new_password, $user_id);
-
-        if ($update->execute()) {
-            unset($_SESSION['pending_reset']); // Clear session
-            $success = "✅ Your password has been updated successfully!";
-        } else {
-            $error = "⚠️ Failed to update password. Please try again.";
-        }
-    } else {
-        $error = "⚠️ Incorrect verification code.";
-    }
+// ✅ Ensure there is a pending registration
+if (!isset($_SESSION['pending_verification_email'])) {
+    header("Location: register.php");
+    exit();
 }
 
-// ✅ Handle resend code
-if (isset($_POST['resend_code'])) {
-    include 'reset_mail.php';
-    $new_code = rand(100000, 999999);
-    $_SESSION['pending_reset']['reset_code'] = $new_code;
+$email = $_SESSION['pending_verification_email'];
 
-    // Fetch user info
-    $stmt = $conn->prepare("SELECT fullname, email FROM users WHERE id = ?");
-    $stmt->bind_param("i", $user_id);
+// Initialize attempt counter
+if (!isset($_SESSION['verification_attempts'])) {
+    $_SESSION['verification_attempts'] = 0;
+}
+
+// ✅ Handle verification submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_code'])) {
+    $enteredCode = trim($_POST['code']);
+    
+    $stmt = $conn->prepare("SELECT * FROM pending_users WHERE email = ?");
+    $stmt->bind_param("s", $email);
     $stmt->execute();
     $res = $stmt->get_result();
     $user = $res->fetch_assoc();
 
-    if (sendForgotPasswordEmail($user['fullname'], $user['email'], $new_code)) {
-        $success = "📩 A new verification code was sent to your email.";
+    if ($user) {
+        if ($enteredCode == $user['verification_code']) {
+            // ✅ Move user to the main users table
+            $insert = $conn->prepare("INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)");
+            $insert->bind_param("sss", $user['fullName'], $user['email'], $user['password']);
+            if ($insert->execute()) {
+                // Remove pending user
+                $del = $conn->prepare("DELETE FROM pending_users WHERE email=?");
+                $del->bind_param("s", $email);
+                $del->execute();
+                $del->close();
+
+                unset($_SESSION['pending_verification_email']);
+                unset($_SESSION['verification_attempts']);
+
+                $success = "✅ Your account has been successfully verified!";
+                header("refresh:2; url=login.php");
+            } else {
+                $error = "⚠️ Failed to save your account. Please try again.";
+            }
+        } else {
+            $_SESSION['verification_attempts']++;
+            $remaining = 3 - $_SESSION['verification_attempts'];
+
+            if ($remaining <= 0) {
+                unset($_SESSION['pending_verification_email']);
+                unset($_SESSION['verification_attempts']);
+                echo "<script>alert('❌ Too many failed attempts. Please register again.'); window.location.href='register.php';</script>";
+                exit();
+            } else {
+                $error = "⚠️ Incorrect code. You have {$remaining} attempt(s) left.";
+            }
+        }
     } else {
-        $error = "⚠️ Failed to resend verification code.";
+        $error = "⚠️ No pending verification found. Please register again.";
+        header("refresh:2; url=register.php");
     }
 }
 ?>
@@ -63,93 +73,120 @@ if (isset($_POST['resend_code'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verify Password Reset | eMentor</title>
-<link rel="icon" type="image/x-icon" href="img/em.png">
+<title>Email Verification | CareerScope</title>
+<link rel="icon" type="image/x-icon" href="img/cs.png">
 <style>
+/* === CareerScope Theme Consistency === */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #e6e6e6;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f2f2f2;
     color: #333;
     margin: 0;
-    padding: 0;
     display: flex;
-    justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    justify-content: center;
+    height: 100vh;
 }
+
 .container {
     background: #fff;
-    max-width: 400px;
-    width: 90%;
-    padding: 30px 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 40px 35px;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     text-align: center;
+    animation: fadeIn 0.6s ease-in-out;
 }
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+.logo {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 15px;
+}
+
 h2 {
     color: #444;
+    font-weight: 600;
     margin-bottom: 10px;
 }
+
 p {
-    color: #666;
+    color: #555;
     font-size: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
+
 input[type="text"] {
     width: 100%;
-    padding: 12px;
-    border-radius: 6px;
+    padding: 14px;
+    border-radius: 10px;
     border: 1px solid #ccc;
     font-size: 16px;
     text-align: center;
-    letter-spacing: 4px;
-    margin-bottom: 15px;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+    outline: none;
+    transition: border-color 0.3s ease;
 }
+
+input[type="text"]:focus {
+    border-color: #ffcc00;
+}
+
 button {
     width: 100%;
     padding: 12px;
     border: none;
-    border-radius: 6px;
+    border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     font-size: 16px;
-    transition: all 0.3s ease;
+    transition: 0.3s;
 }
+
 .verify-btn {
-    background: #ffcc00;
-    color: #004080;
+    background-color: #ffcc00;
+    color: #333;
 }
 .verify-btn:hover {
-    background: #e6b800;
+    background-color: #e6b800;
+    box-shadow: 0 0 10px rgba(255,204,0,0.5);
 }
-.resend-btn {
-    background: #ddd;
+
+.back-btn {
+    background-color: #d9d9d9;
     color: #333;
     margin-top: 10px;
 }
-.resend-btn:hover {
-    background: #ccc;
-}
-.back-btn {
-    background: #004080;
-    color: #fff;
-    margin-top: 15px;
-}
 .back-btn:hover {
-    background: #003366;
+    background-color: #c2c2c2;
 }
+
 .message {
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 6px;
     margin-bottom: 15px;
     font-size: 14px;
 }
-.success { background: #d4edda; color: #155724; }
-.error { background: #f8d7da; color: #721c24; }
+.success {
+    background: #d4edda;
+    color: #155724;
+}
+.error {
+    background: #f8d7da;
+    color: #721c24;
+}
 
+/* Responsive */
 @media (max-width: 480px) {
     .container {
-        padding: 25px 20px;
+        padding: 30px 25px;
     }
     h2 {
         font-size: 1.4rem;
@@ -160,8 +197,9 @@ button {
 <body>
 
 <div class="container">
-    <h2>🔐 Verify Reset Code</h2>
-    <p>Enter the 6-digit code sent to your email to confirm your password change.</p>
+    <img src="img/cs.png" alt="CareerScope Logo" class="logo">
+    <h2>Verify Your Account</h2>
+    <p>Enter the 6-digit verification code we sent to your email.</p>
 
     <?php if($success): ?><div class="message success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
     <?php if($error): ?><div class="message error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
@@ -169,14 +207,11 @@ button {
     <?php if(empty($success)): ?>
     <form method="POST">
         <input type="text" name="code" placeholder="Enter Code" maxlength="6" required>
-        <button type="submit" name="verify_code" class="verify-btn">✅ Verify Code</button>
+        <button type="submit" name="verify_code" class="verify-btn">Verify</button>
     </form>
-
-    <form method="POST">
-        <button type="submit" name="resend_code" class="resend-btn">🔁 Resend Code</button>
-    </form>
+    <a href="register.php"><button type="button" class="back-btn">Back to Register</button></a>
     <?php else: ?>
-    <a href="settings.php"><button class="back-btn">⬅️ Back to Settings</button></a>
+    <a href="login.php"><button type="button" class="verify-btn">Continue to Login</button></a>
     <?php endif; ?>
 </div>
 
