@@ -1,0 +1,63 @@
+ML,YOE:ML,DL,YOE:DL,Image Processing,YOE:Image Processing,Python,YOE:python,Java,YOE:Java,C,YOE:C,HTML,YOE:HTML,CSS,YOE:CSS,MYSQL,YOE:MYSQL,NLP,YOE:NLP,CGPA,ROLE
+yes,1,yes,1,yes,0,yes,1,no,0,no,0,yes,2,yes,2,yes,2,yes,1,2.94,Full stack Developer
+yes,2,yes,2,yes,3,yes,4,yes,2,no,0,no,0,no,0,no,0,no,0,2.63,AIML engineer
+yes,2,yes,2,yes,4,yes,2,yes,1,yes,1,no,0,no,0,yes,1,no,0,2.45,AIML engineer
+yes,1,yes,1,no,0,yes,1,yes,1,yes,0,no,0,yes,2,yes,2,no,0,3.71,Software Developer
+yes,2,yes,1,no,0,yes,1,yes,1,yes,1,yes,3,yes,3,yes,2,yes,0,2.9,Software Developer
+yes,0,yes,0,yes,0,yes,2,yes,2,yes,1,yes,2,yes,1,yes,0,no,0,2.92,Full stack Developer
+no,0,yes,2,yes,3,yes,1,yes,1,yes,1,no,0,no,0,no,0,no,0,2.05,AIML engineer
+yes,1,yes,0,yes,1,yes,1,yes,1,yes,0,yes,1,yes,1,yes,3,yes,2,3.77,Developer
+yes,0,yes,0,yes,0,yes,1,yes,2,yes,1,yes,2,yes,2,no,0,yes,1,3.58,Full stack Developer
+yes,1,yes,1,no,0,yes,3,no,0,yes,1,yes,0,yes,1,yes,3,yes,1,2.85,Data analyst
+yes,0,yes,0,no,0,yes,1,yes,2,yes,1,yes,2,yes,2,yes,1,yes,1,3.07,Tester
+yes,1,yes,1,yes,1,yes,2,yes,2,yes,1,yes,2,yes,2,yes,0,yes,1,3.66,UI/UX Designer
+yes,2,yes,2,yes,3,yes,1,no,0,no,0,yes,1,yes,1,yes,0,yes,1,2.17,AIML engineer
+yes,0,yes,0,no,0,yes,1,yes,1,yes,1,no,0,yes,1,yes,2,no,2,2.83,Data analyst
+yes,1,yes,1,no,0,yes,1,no,0,yes,1,yes,2,yes,2,yes,1,no,0,2.18,Tester
+yes,1,yes,1,yes,1,yes,1,no,0,yes,1,yes,3,yes,1,yes,1,yes,0,2.99,Front End Developer
+yes,1,yes,1,yes,1,yes,1,yes,2,yes,1,yes,2,yes,2,yes,1,yes,1,3.69,UI/UX Designer
+yes,1,no,0,no,0,yes,1,yes,1,yes,1,yes,2,no,0,yes,1,no,0,1.38,Front End Developer
+yes,0,yes,0,no,0,yes,1,yes,2,yes,1,yes,2,yes,2,yes,1,yes,1,1.8,Tester
+yes,1,yes,1,no,0,yes,1,yes,2,yes,1,no,0,no,0,yes,2,no,0,1.7,software engineer
+yes,1,yes,0,yes,1,yes,1,yes,1,yes,0,yes,1,yes,1,yes,3,yes,2,3.01,Developer
+yes,1,yes,1,no,0,yes,1,no,0,yes,1,yes,2,yes,2,yes,1,no,0,3.06,Tester
+yes,1,yes,1,yes,1,yes,3,yes,3,yes,2,no,0,no,0,yes,1,no,0,3.09,Manager
+no,0,yes,1,no,0,yes,2,yes,2,yes,2,no,0,no,0,yes,1,no,0,2.5,software architect
+yes,0,yes,0,no,0,yes,1,yes,1,yes,1,no,0,yes,1,yes,2,no,2,2.76,Data analyst
+no,0,yes,1,no,0,yes,2,yes,2,yes,2,no,0,no,0,yes,1,no,0,1.9,software architect
+yes,1,yes,1,yes,1,yes,3,yes,3,yes,2,no,0,no,0,yes,1,no,0,3.12,Manager
+yes,1,yes,0,yes,1,yes,1,yes,1,yes,0,yes,1,yes,1,yes,3,yes,2,2.74,Developer
+yes,1,yes,1,no,0,yes,1,yes,2,yes,1,no,0,no,0,yes,2,no,0,2.81,software engineer
+yes,1,yes,1,yes,1,yes,2,yes,2,yes,1,yes,2,yes,2,yes,0,yes,1,2.4,UI/UX Designer
+yes,2,yes,2,yes,3,yes,1,yes,2,yes,1,no,0,no,0,yes,1,no,0,3.5,AIML engineer
+no,1,no,1,no,0,no,1,yes,0,yes,0,no,2,no,2,no,2,no,1,3.857507595,software engineer
+no,2,no,2,no,3,no,4,no,2,yes,0,yes,0,yes,0,yes,0,yes,0,2.931738604,UI/UX Designer
+no,2,no,2,no,4,no,2,no,1,no,1,yes,0,yes,0,no,1,yes,0,3.12680646,software engineer
+no,1,no,1,yes,0,no,1,no,1,no,0,yes,0,no,2,no,2,yes,0,3.346934987,Software Developer
+no,2,no,1,yes,0,no,1,no,1,no,1,no,3,no,3,no,2,no,0,3.826079936,Team Lead
+no,0,no,0,no,0,no,2,no,2,no,1,no,2,no,1,no,0,yes,0,3.155460478,software architect
+yes,0,no,2,no,3,no,1,no,1,no,1,yes,0,yes,0,yes,0,yes,0,3.957863708,UI/UX Designer
+no,1,no,0,no,1,no,1,no,1,no,0,no,1,no,1,no,3,no,2,2.515821439,AIML engineer
+no,0,no,0,no,0,no,1,no,2,no,1,no,2,no,2,yes,0,no,1,2.855234703,AIML engineer
+no,1,no,1,yes,0,no,3,yes,0,no,1,no,0,no,1,no,3,no,1,3.967418597,Developer
+no,0,no,0,yes,0,no,1,no,2,no,1,no,2,no,2,no,1,no,1,2.334866935,software architect
+no,1,no,1,no,1,no,2,no,2,no,1,no,2,no,2,no,0,no,1,3.387951715,Data analyst
+no,2,no,2,no,3,no,1,yes,0,yes,0,no,1,no,1,no,0,no,1,2.008605516,AIML engineer
+no,0,no,0,yes,0,no,1,no,1,no,1,yes,0,no,1,no,2,yes,2,3.989384693,Manager
+no,1,no,1,yes,0,no,1,yes,0,no,1,no,2,no,2,no,1,yes,0,3.522139491,software engineer
+no,1,no,1,no,1,no,1,yes,0,no,1,no,3,no,1,no,1,no,0,2.695310205,Data analyst
+no,1,no,1,no,1,no,1,no,2,no,1,no,2,no,2,no,1,no,1,3.181686343,Developer
+no,1,yes,0,yes,0,no,1,no,1,no,1,no,2,yes,0,no,1,yes,0,3.344039373,Developer
+no,0,no,0,yes,0,no,1,no,2,no,1,no,2,no,2,no,1,no,1,3.172305642,Team Lead
+no,1,no,1,yes,0,no,1,no,2,no,1,yes,0,yes,0,no,2,yes,0,3.598349338,Tester
+no,1,no,0,no,1,no,1,no,1,no,0,no,1,no,1,no,3,no,2,2.70959802,Software Developer
+no,1,no,1,yes,0,no,1,yes,0,no,1,no,2,no,2,no,1,yes,0,2.295511199,software engineer
+no,1,no,1,no,1,no,3,no,3,no,2,yes,0,yes,0,no,1,yes,0,3.725670933,Tester
+yes,0,no,1,yes,0,no,2,no,2,no,2,yes,0,yes,0,no,1,yes,0,3.263789466,Front End Developer
+no,0,no,0,yes,0,no,1,no,1,no,1,yes,0,no,1,no,2,yes,2,2.851369772,Software Developer
+yes,0,no,1,yes,0,no,2,no,2,no,2,yes,0,yes,0,no,1,yes,0,2.140579277,Manager
+no,1,no,1,no,1,no,3,no,3,no,2,yes,0,yes,0,no,1,yes,0,2.636670885,software architect
+no,1,no,0,no,1,no,1,no,1,no,0,no,1,no,1,no,3,no,2,3.615403366,Software Developer
+no,1,no,1,yes,0,no,1,no,2,no,1,yes,0,yes,0,no,2,yes,0,2.062758646,AIML engineer
+no,1,no,1,no,1,no,2,no,2,no,1,no,2,no,2,no,0,no,1,2.904562994,Front End Developer
+no,2,no,2,no,3,no,1,no,2,no,1,yes,0,yes,0,no,1,yes,0,3.461068161,Manager

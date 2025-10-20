@@ -23,250 +23,237 @@ if (isset($conn) && $conn instanceof mysqli) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Dashboard - Career Trends in IT</title>
-  <style>
-    * {margin:0; padding:0; box-sizing:border-box;}
-    body {
-      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background:#e9ecef;
-      color:#333;
-      overflow-x:hidden;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerScope Admin Dashboard</title>
+<link rel="icon" type="image/x-icon" href="img/cs.png">
 
-    /* Sidebar */
-    .sidebar {
-      height:100vh;
-      width:250px;
-      position:fixed;
-      top:0;
-      left:-250px;
-      background:#2f2f2f;
-      color:#fff;
-      padding-top:60px;
-      transition:0.3s;
-      overflow:auto;
-      z-index:1000;
-    }
-    .sidebar a {
-      display:block;
-      padding:14px 20px;
-      color:#fff;
-      text-decoration:none;
-      transition:0.3s;
-    }
-    .sidebar a:hover, .sidebar a.active {
-      background:#444;
-    }
-    .open-btn {
-      font-size:24px;
-      cursor:pointer;
-      background:none;
-      border:none;
-      color:#fff;
-      position:absolute;
-      left:20px;
-      top:20px;
-      z-index:1100;
-    }
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-    header {
-      background:linear-gradient(135deg,#444,#222);
-      color:#fff;
-      padding:25px 0;
-      text-align:center;
-      box-shadow:0 4px 12px rgba(0,0,0,0.1);
-      position:relative;
-    }
-    header h1 {font-size:2rem; margin-bottom:10px;}
-    header p {opacity:0.9; font-size:0.95rem;}
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
 
-    .container {
-      max-width:1200px;
-      margin:40px auto;
-      padding:30px;
-      background:#fff;
-      border-radius:15px;
-      box-shadow:0 4px 20px rgba(0,0,0,0.08);
-    }
+/* HEADER */
+header {
+  background: linear-gradient(135deg, #666, #888);
+  color: white;
+  padding: 25px 0;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  position: relative;
+}
+header h1 { font-size: 2rem; margin-bottom: 8px; }
+header p { font-size: 1rem; opacity: 0.9; }
 
-    h2 {
-      color:#333;
-      margin-bottom:25px;
-      text-align:center;
-      font-size:1.8rem;
-      position:relative;
-      padding-bottom:15px;
-    }
-    h2::after {
-      content:'';
-      position:absolute;
-      bottom:0;
-      left:50%;
-      transform:translateX(-50%);
-      width:100px;
-      height:3px;
-      background:linear-gradient(90deg,#444,#888);
-      border-radius:3px;
-    }
-    .intro-text {
-      font-size:1em;
-      margin-bottom:40px;
-      text-align:center;
-      color:#555;
-      max-width:800px;
-      margin-left:auto;
-      margin-right:auto;
-    }
+/* HAMBURGER */
+.hamburger {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 30px;
+  height: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  z-index: 300;
+}
+.hamburger span {
+  height: 4px;
+  background: white;
+  border-radius: 2px;
+}
 
-    .stats-grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-      gap:30px;
-      margin-bottom:40px;
-    }
+/* SIDEBAR */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background: #444;
+  color: white;
+  padding: 60px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: left 0.3s ease;
+  z-index: 200;
+}
+.sidebar.active { left: 0; }
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  padding: 8px 0;
+  display: block;
+  transition: 0.3s;
+}
+.sidebar a:hover,
+.sidebar a.active {
+  color: #ffcc00;
+  transform: translateX(5px);
+}
 
-    /* Clickable Stat Cards */
-    .stat-card {
-      background-color:#fdfdfd;
-      padding:25px 20px;
-      border-radius:12px;
-      text-align:center;
-      box-shadow:0 4px 10px rgba(0,0,0,0.05);
-      transition:all 0.3s ease;
-      border:1px solid #ddd;
-      cursor:pointer;
-      text-decoration:none;
-      color:inherit;
-      display:block;
-    }
-    .stat-card:hover {
-      transform:translateY(-5px);
-      box-shadow:0 8px 20px rgba(0,0,0,0.1);
-      background-color:#f5f5f5;
-    }
-    .stat-card img {
-      width:60px;
-      height:60px;
-      margin-bottom:15px;
-    }
-    .stat-number {
-      font-size:2.2rem;
-      font-weight:bold;
-      color:#333;
-      margin-bottom:10px;
-    }
-    .stat-label {
-      font-size:1rem;
-      color:#555;
-    }
+/* OVERLAY */
+.overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 100;
+}
+.overlay.active { opacity: 1; visibility: visible; }
 
-    footer {
-      text-align:center;
-      padding:30px 0;
-      background:linear-gradient(135deg,#333,#222);
-      color:#fff;
-      font-size:0.95em;
-      margin-top:60px;
-    }
-    .footer-links {
-      display:flex;
-      justify-content:center;
-      flex-wrap:wrap;
-      gap:15px;
-      margin-bottom:15px;
-    }
-    .footer-links a {
-      color:#ffcc00;
-      text-decoration:none;
-      transition:color 0.3s ease;
-      font-size:0.95em;
-    }
-    .footer-links a:hover {color:white;}
+/* MAIN CONTAINER */
+.container {
+  max-width: 1000px;
+  margin: 60px auto;
+  padding: 40px 25px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  text-align: center;
+}
+.container h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 15px;
+}
+.container p {
+  color: #555;
+  font-size: 1.05rem;
+  margin-bottom: 40px;
+}
 
-    /* Overlay for mobile sidebar */
-    .overlay {
-      display:none;
-      position:fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      background:rgba(0,0,0,0.5);
-      z-index:900;
-    }
+/* STAT CARDS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+.stat-card {
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #eee;
+  text-decoration: none;
+  color: inherit;
+}
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+.stat-card img {
+  width: 60px;
+  margin-bottom: 15px;
+}
+.stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+.stat-label {
+  color: #555;
+  font-size: 1rem;
+}
 
-    @media (max-width:768px){
-      header h1 {font-size:1.6rem;}
-      .open-btn {font-size:22px; top:15px;}
-      .container {padding:20px;}
-      .stat-number {font-size:1.8rem;}
-      .stat-card img {width:50px; height:50px;}
-      .sidebar {width:220px;}
-      h2 {font-size:1.5rem;}
-    }
-  </style>
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #444;
+  color: #ddd;
+  margin-top: 60px;
+  font-size: 0.95rem;
+}
+footer a {
+  color: #ffcc00;
+  text-decoration: none;
+}
+footer a:hover { text-decoration: underline; }
+
+@media (max-width: 768px) {
+  header h1 { font-size: 1.6rem; }
+  .container { padding: 25px 15px; }
+  .stat-number { font-size: 1.8rem; }
+}
+</style>
 </head>
 <body>
-  <!-- Sidebar -->
-  <div id="sidebar" class="sidebar">
-    <a href="dashboard.php" class="active">Dashboard</a>
-    <a href="admin-users.php">User Management</a>
-    <a href="admin-content.php">Career Content</a>
-    <a href="admin-certificates.php">Certificates</a>
-    <a href="admin-roadmaps.php">Career Roadmaps</a>
-    <a href="logout.php">Logout</a>
+
+<header>
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
   </div>
-  <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+  <h1>CareerScope Admin Dashboard</h1>
+  <p>Manage and monitor platform activity</p>
+</header>
 
-  <header>
-    <button class="open-btn" onclick="toggleSidebar()">☰</button>
-    <h1>Admin Dashboard</h1>
-    <p>Manage and monitor your Career Trends platform</p>
-  </header>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <a href="dashboard.php" class="active">Dashboard</a>
+  <a href="admin-users.php">User Management</a>
+  <a href="admin-content.php">Career Content</a>
+  <a href="admin-certificates.php">Certificates</a>
+  <a href="admin-roadmaps.php">Career Roadmaps</a>
+  <hr style="border:1px solid rgba(255,255,255,0.2);">
+  <a href="logout.php" onclick="return confirm('Are you sure you want to logout?');">Logout</a>
+</div>
+<div class="overlay" id="overlay"></div>
 
-  <div class="container">
-    <h2>System Overview</h2>
-    <p class="intro-text">
-      Monitor key metrics and manage your platform efficiently with comprehensive administrative tools.
-    </p>
-    
-    <div class="stats-grid">
-      <a href="admin-users.php" class="stat-card">
-        <img src="https://img.icons8.com/color/96/000000/user.png" alt="Users" />
-        <div class="stat-number"><?= number_format($totalUsers) ?></div>
-        <div class="stat-label">Total Users</div>
-      </a>
+<!-- MAIN CONTENT -->
+<div class="container">
+  <h2>System Overview</h2>
+  <p>Monitor key metrics and manage your CareerScope platform efficiently.</p>
 
-      <a href="admin-roadmaps.php" class="stat-card">
-        <img src="https://img.icons8.com/color/96/000000/content.png" alt="Careers" />
-        <div class="stat-number"><?= number_format($totalCareers) ?></div>
-        <div class="stat-label">Careers</div>
-      </a>
-    </div>
+  <div class="stats-grid">
+    <a href="admin-users.php" class="stat-card">
+      <img src="https://img.icons8.com/color/96/000000/user.png" alt="Users" />
+      <div class="stat-number"><?= number_format($totalUsers) ?></div>
+      <div class="stat-label">Total Users</div>
+    </a>
+
+    <a href="admin-roadmaps.php" class="stat-card">
+      <img src="https://img.icons8.com/color/96/000000/content.png" alt="Careers" />
+      <div class="stat-number"><?= number_format($totalCareers) ?></div>
+      <div class="stat-label">Total Careers</div>
+    </a>
   </div>
+</div>
 
-  <footer>
-    <div class="footer-links">
-      <a href="privacy.php">Privacy Policy</a>
-      <a href="terms.php">Terms of Service</a>
-      <a href="contact.php">Contact Us</a>
-    </div>
-    <p>&copy; 2025 Mapping The Future System. All rights reserved.</p>
-    <p>Bulacan State University - Bustos Campus</p>
-  </footer>
+<footer>
+  <p>&copy; <?= date("Y") ?> CareerScope | Empowering students with data-driven guidance |
+     <a href="about.php">Learn More</a>
+  </p>
+</footer>
 
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      const overlay = document.getElementById("overlay");
-      const isOpen = sidebar.style.left === "0px";
+<script>
+const hamburger = document.getElementById('hamburger');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
 
-      sidebar.style.left = isOpen ? "-250px" : "0px";
-      overlay.style.display = isOpen ? "none" : "block";
-      document.body.style.overflow = isOpen ? "auto" : "hidden";
-    }
-  </script>
+hamburger.addEventListener('click', () => {
+  sidebar.classList.toggle('active');
+  overlay.classList.toggle('active');
+});
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('active');
+  overlay.classList.remove('active');
+});
+</script>
+
 </body>
 </html>
